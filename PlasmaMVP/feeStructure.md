@@ -3,8 +3,7 @@
 ## Problem:
 There needs to be an incentive for validators to run a full node on the plasma side chain. The obvious economic incentive is to charge fees on any spend utxo on the child chain. Due to the high volume of transactions per block on the child chain, 2^16 slots, the fees per transactions will remain relatively low.
 
-GOAL:  
-  Due to the role of confirm signatures, we need to ensure that proposer responsible for a block can securely withdraw their rightfully earned fees even in the scenario of a mass exit.  
+GOAL: Due to the role of confirm signatures, we need to ensure that the proposer responsible for a block can securely withdraw their rightfully earned fees in the scenario of a mass exit.  
 
 ## Potential Solutions:
 
@@ -19,7 +18,7 @@ Does this change introduce a new challenge mechansim? Are there checks to ensure
 ### Fees Stored in Utxos
 In our earlier discussion of a plasma side chain vulnerability, [Ethereum Research Post](https://ethresear.ch/t/plasma-vulnerabiltity-sybil-txs-drained-contract/1654), regarding the plasma mvp spec not specifying the requirement of storing confirm sigs on-chain, we can exploit this to solve our issues with fees!  
 
-By requiring that a utxo cannot be spent without the correct confirm signatures that now are included in the txBytes stored on-chain, spending a utxo on the child chain allows anyone watching to successfully challenge an invalid attempt to exit any grandparent of that particular utxo. We can be rest assured that this requirement makes it very unlikely to exit a invalid uxto successfully.  
+By requiring that a utxo cannot be spent without the correct confirm signatures that now are included in the txBytes stored on-chain, spending a utxo on the child chain allows anyone watching to successfully challenge an invalid attempt to exit any grandparent of that particular utxo. We claim that that this requirement makes it very unlikely to exit a invalid uxto successfully.  
 
 We can take advantage of this by having a validator collect fees corresponding to the inputs of all utxos in his/her block. As specified in the txBytes, the fees must be deducted from the inputs. A valid spend message on the child chain follows this equality:  
 
