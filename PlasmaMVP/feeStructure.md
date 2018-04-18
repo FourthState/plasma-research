@@ -15,7 +15,7 @@ We can require all participants of the side chain to allocate and bond a fee bud
 
 
 ### Fees Stored in Utxos
-In our earlier discussion of a plasma side chain vulnerability, [https://ethresear.ch/t/plasma-vulnerabiltity-sybil-txs-drained-contract/1654](Ethereum Research Post), regarding the plasma mvp spec not specifying the requirement of storing confirm sigs on-chain, we can exploit this to solve our issues with fees!  
+In our earlier discussion of a plasma side chain vulnerability, [Ethereum Research Post] (https://ethresear.ch/t/plasma-vulnerabiltity-sybil-txs-drained-contract/1654), regarding the plasma mvp spec not specifying the requirement of storing confirm sigs on-chain, we can exploit this to solve our issues with fees!  
 By requiring that a utxo cannot be spent without the correct confirm signatures that now are included in the txBytes stored on-chain, spending a utxo on the child chain allows anyone watching the child chain to successfully challenge and invalid attempt to exit any grandparent of that particular utxo. We can be rest assured that this requirement  
 makes it very unlikely to exit a invalid uxto successfully.  
 We can take advantage of this by having a validator collect fees corresponding to the inputs of all utxos in his/her block. As specified in the txBytes, the fees must be deducted from the inputs. A valid spend message on the child chain follows this equality:  
