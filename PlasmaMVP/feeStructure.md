@@ -1,17 +1,30 @@
 # Plamsa MVP Fee Structures
 
 ## Problem:
-A Plasma validator includes a transaction in a block and corresponding confirm sigs must be added in future transactions spending the original utxo or the utxo must be withdrawn before he can actually collect transaction fees.
+There needs to be an incentive for validator's to run a full node on a plasma side chain. The obvious economic incentive is to chargee fees to spend any utxo on the child chain.  
+Due to the high volume of transactions per block on the child chain, 2^16 slots, the fees per transactions will remain relatively low.   
+
+GOAL:
+  *Due to the role of confirm signatures for each spent utxo per block, we need to ensure that validator responsible for the creation of the block can withdraw the fees associated with each transaction in the block.  
 
 ## Potential Solutions:
 
 ### Fee Budget:
-There is a mapping from address to max amount of fee you're willing to pay. Validator checks to see you haven't exceeded your fee budget before adding your transaction to the block. A validator can withdraw by showing user signed over a fee and that transaction was included in a block that the validator submitted. The validator has to submit an expensive transaction each time he wants to exit a single fee of a single transaction. This may be solved with aggregate signatures.
+We can require all participants of the side chain to allocate and bond fee budget of ether on the rootchain. In addition to all the previous contrainsts on what constitutes a valid transaction, we impose that any accounts attempting to spend a transcation must specify a fee denomination in the txBytes that is checked against the rootchain.  
+Per every transaction processed, the validator for a current round will deduct from all participant's allocated budget on the rootchain. However, this opens up another order of complexity that we would like to avoid.  
+Does this change introduce a new challenge mechansim? Are there checks to ensure that the validator only deducts the fee amount specified in the txBytes? How much code will this change/introduce in the rootchain?  
 
-### Claim Fee:
-When a Plasma validator would like to withdraw his fees, he submits the amount he would like to withdraw, and his exit is added to the exitQueue with the lowest possible priority of the current block (currBlockNum, 2^16, 1). This way, users can verify that the amount he would like to withdraw doesn't exceed the amount of fees he has earned.
-* In the case of a valid fee withdrawal, his exit will not be challenged and his fee will be sent after the 1 week period.
-* In the case of an invalid fee withdrawal, users will see that and initiate a mass withdrawal. Since the validator has the lowest priority, all other users' exits will be processed before his, leaving him with the true fee amount.
+  For these questions alone, this solution is not sufficient
+
 
 ### Fees Stored in Utxos
-Fees are included in the transaction. When a validator creates a block, he reserves a utxo at the last leaf (to give himself the lowest priority in the block) of the block where he can aggregate all the fees of this block. This utxo will look like a deposit utxo. Users can check that the amount stored in this fee utxo is correct. If the amount or transaction is found to be invalid, users will mass exit.
+In our earlier discussion of a plasma side chain vulnerability, [https://ethresear.ch/t/plasma-vulnerabiltity-sybil-txs-drained-contract/1654] (Ethereum Research Post), regarding the plasma mvp spec not specifying the requirement of storing confirm sigs on-chain, we can exploit this to solve our issues with fees!  
+By requiring that a utxo cannot be spent without the correct confirm signatures that now are included in the txBytes stored on-chain, spending a utxo on the child chain allows anyone watching the child chain to successfully challenge and invalid attempt to exit any grandparent of that particular utxo. We can be rest assured that this requirement  
+makes it very unlikely to exit a invalid uxto successfully.  
+We can take advantage of this by having a validator collect fees corresponding to the inputs of all utxos in his/her block. As specified in the txBytes, the fees must be deducted from the inputs. A valid spend message on the child chain follows this equality:  
+
+    * `` Amount1 + Amount2 + Fee = Output1 + Output2 ``    
+
+While processing each tx, the validator can aggregate all input fees, and create a new utxo with no history belonging to them as the very last utxo in the block. By placing this new utxo last, all watchers of this child chain can verify the validity of the denomination of the new utxo by aggregating the fees for each tx themselves. Malicious activity of this last tx is grounds for a mass exit of the child chain.  
+All participants that spent their utxo in the invalid block keep the ability to exit before the validator (confirm sig never broadcasted and their lower blockNum will lead to a quicker finalized exit). Additionally, an honest validator can rest assured that they can always withdraw this new uxto due to their ability to challenge any transcation of all grandparent txs and beyond because of the confirm signatures stored on chain.
+
