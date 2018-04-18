@@ -22,14 +22,14 @@ By requiring that a utxo cannot be spent without the correct confirm signatures 
 
 We can take advantage of this by having a validator collect fees corresponding to the inputs of all utxos in his/her block. As specified in the txBytes, the fees must be deducted from the inputs. A valid spend message on the child chain follows this equality:  
 
-     ``` Amount1 + Amount2 + Fee = Output1 + Output2 ```  
+    Amount1 + Amount2 + Fee = Output1 + Output2  
 
-The fees are determined by the participants and not the validators. This allows validators to choose with spend messages to include from the mempool. However due to the high volume, the market will most likely settle at an expected low transaction fee
+The fees are determined by the participants and not the validators. This allows validators to choose which spend messages to include from the mempool. However due to the high volume, the market will most likely settle at an expected low transaction fee
 
-While processing each tx, the validator aggregates all input fees, and creates a new utxo with no history owned by them as the very last utxo in the block. By placing this new utxo last, all watchers of this child chain can verify the validity of the denomination of the new utxo by aggregating the fees for each tx themselves. Malicious activity of this last tx is grounds for a mass exit of the child chain.  
+While processing each tx, the validator aggregates all input fees, and creates a new utxo with no history owned by them as the very last utxo in the block. By placing this new utxo last, all watchers of this child chain can verify the validity of the denomination of the new utxo by aggregating the fees for each tx themselves. Malicious activity of this last tx is grounds for a mass exit of the child chain. Placing the new utxo last also ensure that the validator has the lowest priority to exit with that block as the current head.
 
-All participants that spent their utxo in the invalid block keep the ability to exit before the validator (confirm sig never broadcasted and their lower blockNum will lead to a quicker finalized exit). Additionally, an honest validator can rest assured that they can always withdraw this new uxto due to their ability to challenge any transcation of all grandparent utxo and beyond because of the confirm signatures stored on chain.
+In the case of an invalid block, all participants that spent their utxo in the invalid block keep the ability to exit before the validator (confirm sig never broadcasted and their lower blockNum will lead to a quicker finalized exit). Additionally, an honest validator can rest assured that they can always withdraw this new uxto due to their ability to challenge any transcation of all grandparent utxo and beyond because of the confirm signatures stored on chain.
 
 
-BONUS: Because the brand new utxo is owned by the proposer of the current block, this solutions scales to a consensus mechanism with more than 1 validator. All without changing the root contract code at all! Simplicity FTW!
+BONUS: Because the brand new utxo is owned by the proposer of the current block, this solutions scales to any consensus mechanism with more than 1 validator. All without changing the root contract code at all! Simplicity FTW!
 
