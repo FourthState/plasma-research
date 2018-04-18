@@ -17,16 +17,16 @@ Since the deposit transaction occurs in a block after the invalid block, it will
 
 The validator can successfully withdraw his invalid UTXO, and the smart contract is drained before it can process the user's deposit.
 
-Solution #1:
+#### Solution #1:
 
 Assign all deposits a priority = 0. This does not work because it will be easy to DOS a child chain by simply depositing and exiting repeatedly. The attacker loses gas, but for a relatively low price he can indefinitely stall exits on the child chain.
 
-Solution #2:
+#### Solution #2:
 
 Change deposit function to ``deposit(validatorBlockNum, txBytes)`` so that user can commit to the latest validatorBlockNum they have seen. If a new validator block gets added before the deposit transaction gets processed, the deposit reverts and the user may resubmit the transaction if the new block is valid.
 
 This may require users to deposit multiple times before succeeding.
 
-Solution #3:
+#### Solution #3:
 
 Have validator-submitted blocks increment in multiples of 1000. Fill in deposits at positions starting from 1 that are not multiples of 1000. This allows the deposit to have a much lower priority than any recent submitted block however the deposit amount is limited to ~1000*(number of submitted blocks). For the vast majority of child chains this will not be an issue.
