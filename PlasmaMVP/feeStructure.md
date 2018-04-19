@@ -18,11 +18,11 @@ Does this change introduce a new challenge mechansim? Are there checks to ensure
 ### Fees Stored in Utxos
 In our earlier discussion of a plasma side chain vulnerability, [Ethereum Research Post](https://ethresear.ch/t/plasma-vulnerabiltity-sybil-txs-drained-contract/1654), regarding the plasma mvp spec not specifying the requirement of storing confirm sigs on-chain, we can exploit this to solve our issues with fees!  
 
-By requiring that a utxo cannot be spent without the correct confirm signatures and also including in them in the txBytes stored on-chain, spending a utxo on the child chain allows anyone watching to successfully challenge an invalid attempt to exit any grandparent of that particular utxo. We claim that that this requirement makes it very unlikely to exit a invalid uxto successfully.  
+By requiring correct confirm signatures be included in a transaction, spending a utxo on the child chain allows anyone watching to successfully challenge an invalid attempt to exit any ancestor of that utxo. We claim that that this requirement makes it very unlikely to exit a invalid uxto successfully.  
 
 We can take advantage of this by having a validator collect fees corresponding to the **inputs** of all utxos in his/her block. As specified in the txBytes, the fees must be deducted from the inputs. A valid spend message on the child chain follows this equality:  
 
-    Amount1 + Amount2 + Fee = Output1 + Output2  
+    Amount1 + Amount2 - Fee = Output1 + Output2  
 
 The fees are determined by the participants and not the validators. This allows validators to choose which spend messages to include from the mempool. However due to the high volume, the market will most likely settle at an average low transaction fee
 
