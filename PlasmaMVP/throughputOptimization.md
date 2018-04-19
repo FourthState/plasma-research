@@ -23,13 +23,13 @@ If the blockNum is ``1 + latestBlock``, we simply check that ``ChildChain[latest
 #### Case 2: Filling in reorged blocks in the middle
 If a block (with blocknumber k < latestBlock) in the middle gets reorged out of existence, one can fill in the gap by creating ``submitBlock(k, kth_block_root, k-1th_block_root, sig)``
 
-Here we check that ``ChildChain[k + 1].prevRoot == root``, this prevents a malicious validator from submitting a block at height k that they did not originally submit in the case where kth block gets reorged.
+Here we check that ``ChildChain[k + 1].prevRoot == kth_block_root``, this prevents a malicious validator from submitting a block at height k that they did not originally submit in the case where kth block gets reorged.
 If multiple blocks are reorged in a row, we simply resubmit the missing block with highest missing height and move towards the lowest missing height.
 
 #### Case 3: n latest blocks get reorged out of existence
 Lastly, there is the case where the last n blocks get reorged out of existence. This is analogous to have one very big block getting reorged out of the existence, and the blocks must be added back in order from lowest height to highest height since latestBlock has been changed to ``latestBlock - n``
 
-In all cases, we check that ``sig`` is the authority's signature over ``keccak(blockNum, root, prevRoot)``. The reason we include this signature is so that anyone can submit blocks to the rootchain so long as they have the authority's signature. This prevents validators from refusing to fill in gaps in the case of a reorg.
+In all cases, we check that ``sig`` is the authority's signature over ``keccak(blockNum, root, prevRoot)``. The reason we include this signature is so that anyone can submit blocks to the rootchain so long as they have the authority's signature. This prevents validators from refusing to fill in gaps in the case of a reorg. If a validator does not broadcast his signature over these fields, a user has grounds to exit since the validator is the only one capable from refilling gaps.
 In all cases, we prevent a submitBlock from replacing an already existing key-value pair in the chilchain mapping.
 
 Pros:
@@ -37,6 +37,18 @@ Pros:
 This approach allows the childchain can continue creating blocks at full speed without waiting for presumed finality on the rootchain.
 The latency for a final transaction hasn't changed because one must wait for the block the transaction was included in to be submitted on to the rootchain and then become presumed final on the rootchain before sending their confirm signatures to the recipient.
 However, the throughput has vastly increased because the child chain does not have to wait for the root chain. Instead, the child chain creates and propagates blocks at full speed and fills in gaps on the rootchain in the case of a reorg.
+
+Let the Ethereum presumed finality bound be F blocks (a transaction on the rootchain must be F blocks deep before it is considered final).
+
+Let child chain be capable of creating B blocks per Ethereum block with T transactions in each block.
+
+Previous Throughput:
+
+``T`` transactions per F Ethereum block because childchain must wait for each submitted block to reach presumed finality before working on next block
+
+New Throughput:
+
+``BFT`` transactions per F Ethereum blocks because childchain can continue working on blocks and refill gaps on rootchain as submitted blocks get reorged.
 
 Cons:
 
