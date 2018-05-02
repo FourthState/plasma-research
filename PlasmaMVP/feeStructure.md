@@ -31,9 +31,8 @@ While processing each tx, the validator aggregates all input fees, and creates a
 In the case of an invalid block, all participants that spent their utxo in the invalid block keep the ability to exit before the validator (confirm sig never broadcasted and their lower blockNum will lead to a quicker finalized exit). Additionally, an honest validator can rest assured that they can always withdraw this new uxto due to their ability to challenge any exits of all grandparent utxos and beyond because of the confirm signatures stored on chain.
 
 There are two different cases in which we assure that the validator is garunteed their fees for a given block.  
-    1. For every transaction included in a block, any spend of the new utxos allows the validator to challenge an invalid exit that would steal the validator fees
-    2. For every transaction included in a block but not spent, maybe the confirmsig was never broadcasted, the previous owner retains the right to withdraw the previous utxo.  
-    In this scenario, the previous owner retains the right to exit but must commit to any fee payed by broadcasting a spend message. The validator will have the opportunity to challenge an exit that does not commit any fees that were payed through a simple merkle proof that shows the transaction being included in a future block.
+1. For every transaction included in a block, any spend of the new utxos allows the validator to challenge an invalid exit that would steal the validator fees
+2. For transactions included in a block but not spent, maybe the confirmsig was never broadcasted, the previous owner retains the right to withdraw the previous utxo. In this scenario, we uphold the right for the previous owner to exit but must commit to any fee payed by broadcasting a spend message. The validator will have the opportunity to challenge an exit that does not commit any fees that were payed through a simple merkle proof that shows the transaction being included in a future block and the associated fees.
 
 
 BONUS: Because the brand new utxo is owned by the proposer of the current block, this solutions scales to any consensus mechanism with more than 1 validator. All without changing the root contract code at all! Simplicity FTW!
