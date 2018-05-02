@@ -32,8 +32,9 @@ In the case of an invalid block, all participants that spent their utxo in the i
 
 There are two different cases in which we assure that the validator is garunteed their fees for a given block.  
 1. For every transaction included in a block, any spend of the new utxos allows the validator to challenge an invalid exit that would steal the validator fees
-2. For transactions included in a block but not spent, maybe the confirmsig was never broadcasted, the previous owner retains the right to withdraw the previous utxo. In this scenario, we uphold the right for the previous owner to exit but must commit to any fee payed by broadcasting a spend message. The validator will have the opportunity to challenge an exit that does not commit any fees that were payed through a simple merkle proof that shows the transaction being included in a future block and the associated fees.
+2. For transactions included in a block but not spent, perhaps the confirmsig was never broadcasted, the previous owner retains the right to withdraw the previous utxo. In this scenario, we uphold the right for the previous owner to exit but they must commit to any fee payed by broadcasting a spend message. The validator can challenge an invalid exit that does commit to fees payed.  
 
+Note: The validator has the ability to steal all current fees in the mempool by submitting invalid blocks. However, this is not an issue because there is zero incentive to steal fees. By mining honest blocks, the validators will eventually claim all fees in the mempool. Additionally, by attaching fees to spend messages in the network, this incentivies users to only broadcast transaction in which they will eventually send confirm signatures.  
 
 **BONUS**: Because the brand new utxo is owned by the proposer of the current block, this solutions scales to any consensus mechanism with more than 1 validator. All without changing much of the root contract code at all! Simplicity FTW!
 
