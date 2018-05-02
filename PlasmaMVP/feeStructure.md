@@ -3,12 +3,12 @@
 ## Problem:
 There needs to be an incentive for validators to run a full node on the plasma side chain. The obvious economic incentive is to charge fees on any spent utxo. Due to the high volume of transactions per block, 2^16 slots, the fees per transactions will remain relatively low.
 
-GOAL: Due to the role of confirm signatures, we need to ensure that the proposer responsible for a block can securely withdraw their rightfully earned fees in the scenario of a mass exit.  
+**GOAL**: Due to the role of confirm signatures, we need to ensure that the proposer responsible for a block can securely withdraw their rightfully earned fees in the scenario of a mass exit.  
 
 ## Potential Solutions:
 
 ### Fee Budget:
-We can require all participants of the side chain to allocate and bond a fee budget of Ether on the rootchain. In addition to the previous constraints on what constitutes a valid transaction, we impose that any accounts attempting to spend a transcation must specify a fee denomination in the txBytes that is checked against the rootchain. Per every transaction processed, the validator for a current round will deduct from all corresponding participant's fee budget. However, this opens up another order of complexity that we would like to avoid.  
+We can require all participants of the side chain to allocate and bond a fee budget of Ether on the rootchain. In addition to the previous constraints on what constitutes a valid transaction, we impose that any users attempting to spend a transcation must specify a fee denomination in the txBytes that is checked against the rootchain. Per every transaction processed, the validator for a current round will deduct from all corresponding participant's fee budget. However, this opens up another order of complexity that we would like to avoid.  
 
 Does this change introduce a new challenge mechansim? Are there checks to ensure that the validator only deducts the fee amount as specified in the txBytes? How much code will this change/introduce in the rootchain?  
 
@@ -35,5 +35,5 @@ There are two different cases in which we assure that the validator is garunteed
 2. For transactions included in a block but not spent, maybe the confirmsig was never broadcasted, the previous owner retains the right to withdraw the previous utxo. In this scenario, we uphold the right for the previous owner to exit but must commit to any fee payed by broadcasting a spend message. The validator will have the opportunity to challenge an exit that does not commit any fees that were payed through a simple merkle proof that shows the transaction being included in a future block and the associated fees.
 
 
-BONUS: Because the brand new utxo is owned by the proposer of the current block, this solutions scales to any consensus mechanism with more than 1 validator. All without changing the root contract code at all! Simplicity FTW!
+**BONUS**: Because the brand new utxo is owned by the proposer of the current block, this solutions scales to any consensus mechanism with more than 1 validator. All without changing much of the root contract code at all! Simplicity FTW!
 
