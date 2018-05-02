@@ -22,13 +22,18 @@ By requiring correct confirm signatures be included in a transaction, spending a
 
 We can take advantage of this by having a validator collect fees corresponding to the **inputs** of all utxos in his/her block. As specified in the txBytes, the fees must be deducted from the inputs. A valid spend message on the child chain follows this equality:  
 
-    Amount1 + Amount2 - Fee = Output1 + Output2  
+    Amount1 + Amount2 - Fee1 - Fee2 = Output1 + Output2  
 
-The fees are determined by the participants and not the validators. This allows validators to choose which spend messages to include from the mempool. However due to the high volume, the market will most likely settle at an average low transaction fee
+The fees are determined by the participants and not the validators. This allows validators to choose which spend messages to include from the mempool. However due to the high volume, the market will most likely settle at an average low transaction fee  
 
 While processing each tx, the validator aggregates all input fees, and creates a new utxo with no history owned by them as the very last utxo in the block. By placing this new utxo last, all watchers of this child chain can verify the validity of the denomination of the new utxo by aggregating the fees for each tx themselves. Malicious activity of this last tx is grounds for a mass exit of the child chain. Placing the new utxo last also ensures that the validator has the lowest priority to exit with that block as the current head.
 
 In the case of an invalid block, all participants that spent their utxo in the invalid block keep the ability to exit before the validator (confirm sig never broadcasted and their lower blockNum will lead to a quicker finalized exit). Additionally, an honest validator can rest assured that they can always withdraw this new uxto due to their ability to challenge any exits of all grandparent utxos and beyond because of the confirm signatures stored on chain.
+
+There are two different cases in which we assure that the validator is garunteed their fees for a given block.  
+    1. For every transaction included in a block, any spend of the new utxos allows the validator to challenge an invalid exit that would steal the validator fees
+    2. For every transaction included in a block but not spent, maybe the confirmsig was never broadcasted, the previous owner retains the right to withdraw the previous utxo.  
+    In this scenario, the previous owner retains the right to exit but must commit to any fee payed by broadcasting a spend message. The validator will have the opportunity to challenge an exit that does not commit any fees that were payed through a simple merkle proof that shows the transaction being included in a future block.
 
 
 BONUS: Because the brand new utxo is owned by the proposer of the current block, this solutions scales to any consensus mechanism with more than 1 validator. All without changing the root contract code at all! Simplicity FTW!
