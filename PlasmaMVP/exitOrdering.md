@@ -47,11 +47,9 @@ Priority is represented by a uint256:
 
 txPos represents the position of the utxo being exited
 
-txPos[0]: block number 
-
-txPos[1]: transaction index
- 
-txPos[2]: output index 
+txPos[0]: block number  
+txPos[1]: transaction index   
+txPos[2]: output index  
 
 We have already shown the right 128 bits to be unique and they will not overflow into the left 128 bit until 10^29 blocks have been created. 
 
