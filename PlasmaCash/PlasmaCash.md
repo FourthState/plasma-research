@@ -18,7 +18,7 @@ Confirmation Signatures are not required since the exact location of a token tra
 * There should not be bonding for exits as a validator could decieve a user into attempting to withdraw a token that has already been spent 
 
 ### Potential:
-Plasma Cash and Plasma MVP make different trade offs for scalability and security. Plasma Cash makes a major improvement by allowing for sharded client-side validation, but its use cases are likely limited. Solutions to the indivisibility of tokens such as through mergning and splitting or state channels would greatly increase the functionality of Plasma Cash.  
+Plasma Cash and Plasma MVP make different trade offs for scalability and security. Plasma Cash makes a major improvement by allowing for sharded client-side validation, but its use cases are likely limited. Solutions to the indivisibility of tokens such as through merging and splitting or state channels would greatly increase the functionality of Plasma Cash.  
 
 ### Implementation using Cosmos-sdk:
 Unlike Plasma MVP, the underlying IAVL tree could be used to implement Plasma Cash as the transaction index would be the hash of the token ID. Proofs of token inclusion/non-inclusion would need to be stored for every block. The majority of the changes based on our current implementation of Plasma MVP would be done on the root contract. These changes include adjusting merkle proof validation, challengeExit functionality and adding a mapping from deposit to token id.
