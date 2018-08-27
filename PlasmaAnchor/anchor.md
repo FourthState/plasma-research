@@ -5,7 +5,7 @@ In order for Plasma to work, the sidechain must be aware of the rootchain smart 
 
 Having a single node act as an oracle for the sidechain would cause a central point of failure. Including the anchor mechanism in the sidechain consensus state introduces a lot of complexity and is not very modular. Anchor is a seperate process that will run Tendermint consensus to determine the latest rootchain state that a quorum of validators deem finalized. This will be used to communicate to the sidechain the latest finalized rootchain state to process deposits and exits.
 
-The sidechain must track `Deposits` in the rootchain so that users can spend finalized deposits on the sidechain. The sidechain should also track `Exits` in order to delete positions that are no longer spendable (space-saving) and prevent users from spamming the chain by spending exitted positions.
+The sidechain must track `Deposits` in the rootchain so that users can spend finalized deposits on the sidechain. The sidechain should also track `Exits` in order to delete positions that are no longer spendable (space-saving) and prevent users from spamming the chain by spending exited positions.
 
 ### App State of Anchor
 The app state of anchor contains the following data in substores:
@@ -56,6 +56,8 @@ type AnchorMsg struct {
 For validator A with subjectively finalized block `bA` and subjectively finalized deposit `nA`.
 
 Then ValidatorA would send `AnchorMsg` with RootchainBlockHash including BlockHashes `B+1` through `bA`, Deposits `N+1` through `nA`, and all new subjectively finalized exits that are not objectively finalized.
+
+The length of each list should have a maximum size. If the validator has more subjectively final data then the maximum list size, she should split that data in smaller chunks. Thus if the max size is 50, and the validator has 60 new subjectively final blocks. She will submit the first 50 blocks in her message; and once at least the first 10 are objectively finalized, she will include the latest 10 subjectively final blocks in the next message.
 
 If the Validator does not agree with the Anchor Chain
 i.e., there exists some blocknumber k < N s.t. Anchor's kth block has a different blockhash then the validator rootchain node's kth blockhash; then the validator does not send an `AnchorMsg` until his rootchain view converges with the AnchorChain.
