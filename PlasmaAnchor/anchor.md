@@ -79,6 +79,8 @@ Thus, `endBlocker` calculates the Maximum Continuous Intersection of BlockHashes
 
 NOTE: Exits have no notion of being continuous so it is just the Intersection of Exits among a 2/3 quorum of validators.
 
+At the end of this for loop, `endBlocker` wipes the data in `Subjective` store so it can be reused in next block.
+
 Since there are a limited number of sidechain validators and the lists are limited to being at most the length of new data that has been added to rootchain since last objectively finalized checkpoint, this isn't an infeasibly expensive calculation to happen in `endBlocker`.
 
 ### Subjective Finality
