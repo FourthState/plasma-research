@@ -16,8 +16,8 @@ Thus in this setup, the validator maintains 3 processes. A geth node (possibly l
 
 ## Sidechain Updates
 
-Regardless of the process used to checkpoint state, the sidechain will grab the latest checkpointed state from the channel during `beginBlocker`.
+Regardless of the process used to checkpoint state, the sidechain will grab the latest checkpointed blockhashes from the channel during `beginBlocker`.
 
-It will then add all checkpointed deposits to a store and delete all utxo positions associated with a checkpointed exit.
+It will then query the geth node to retrieve all deposits and exits that were included in blocks that were finalized by Anchor.
 
 After this point, it can approve any spends of the checkpointed deposits on the sidechain and reject any spends of the checkpointed exits.
